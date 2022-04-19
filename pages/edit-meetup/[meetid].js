@@ -31,71 +31,114 @@ const EditMeetup = (props) => {
     )
 }
 
-export async function getStaticPaths() {
-    // const client = await MongoClient.connect(
-    //   "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
-    // );
-    const client = await MongoClient.connect(
-      "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
-    );
-    const db = client.db();
-    const meetupsCollection = db.collection("meetups");
+export async function getServerSideProps(context) {
+  // //fetch data for a single meetup
+  const meetupId = context.params.meetid;
   
-    //const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
-    const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
-  
-    client.close();
-  
-    return {
-      fallback: false,
-      paths: meetups.map((meetup) => ({
-        params: { meetid: meetup._id.toString() },
-      })),
-    };
+  // const client = await MongoClient.connect(
+  //   "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
+  // );
+
+  const client = await MongoClient.connect(
+    "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  });
+  console.log(selectedMeetup);
+  client.close();
+
+  // const response = await fetch("/api/get-meetup", {
+  //     method: "POST",
+  //     body: JSON.stringify({meetupid: meetupId}),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  // });
+  // const data = await response.json();
+  // console.log(data);
+
+  return {
+    props: {
+      meetupData: {
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description,
+      }
+    },
+  };
 }
 
-export async function getStaticProps(context) {
-    // //fetch data for a single meetup
-    const meetupId = context.params.meetid;
+// export async function getStaticPaths() {
+//     // const client = await MongoClient.connect(
+//     //   "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
+//     // );
+//     const client = await MongoClient.connect(
+//       "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
+//     );
+//     const db = client.db();
+//     const meetupsCollection = db.collection("meetups");
   
-    // const client = await MongoClient.connect(
-    //   "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
-    // );
+//     //const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+//     const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+  
+//     client.close();
+  
+//     return {
+//       fallback: false,
+//       paths: meetups.map((meetup) => ({
+//         params: { meetid: meetup._id.toString() },
+//       })),
+//     };
+// }
 
-    const client = await MongoClient.connect(
-      "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
-    );
-    const db = client.db();
-    const meetupsCollection = db.collection("meetups");
+// export async function getStaticProps(context) {
+//     // //fetch data for a single meetup
+//     const meetupId = context.params.meetid;
   
-    const selectedMeetup = await meetupsCollection.findOne({
-      _id: ObjectId(meetupId),
-    });
-    console.log(selectedMeetup);
-    client.close();
+//     // const client = await MongoClient.connect(
+//     //   "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
+//     // );
 
-    // const response = await fetch("/api/get-meetup", {
-    //     method: "POST",
-    //     body: JSON.stringify({meetupid: meetupId}),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    // });
-    // const data = await response.json();
-    // console.log(data);
+//     const client = await MongoClient.connect(
+//       "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
+//     );
+//     const db = client.db();
+//     const meetupsCollection = db.collection("meetups");
   
-    return {
-      props: {
-        meetupData: {
-          id: selectedMeetup._id.toString(),
-          title: selectedMeetup.title,
-          address: selectedMeetup.address,
-          image: selectedMeetup.image,
-          description: selectedMeetup.description,
-        },
-        revalidate: 1,
-      },
-    };
-}
+//     const selectedMeetup = await meetupsCollection.findOne({
+//       _id: ObjectId(meetupId),
+//     });
+//     console.log(selectedMeetup);
+//     client.close();
+
+//     // const response = await fetch("/api/get-meetup", {
+//     //     method: "POST",
+//     //     body: JSON.stringify({meetupid: meetupId}),
+//     //     headers: {
+//     //       "Content-Type": "application/json",
+//     //     },
+//     // });
+//     // const data = await response.json();
+//     // console.log(data);
+  
+//     return {
+//       props: {
+//         meetupData: {
+//           id: selectedMeetup._id.toString(),
+//           title: selectedMeetup.title,
+//           address: selectedMeetup.address,
+//           image: selectedMeetup.image,
+//           description: selectedMeetup.description,
+//         },
+//         revalidate: 1,
+//       },
+//     };
+// }
 
 export default EditMeetup;
