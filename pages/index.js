@@ -32,8 +32,7 @@ function HomePage(props) {
     </Fragment>
   );
 }
-
-export async function getStaticProps() {
+export async function getServerSideProps(){
   const client = await MongoClient.connect(
     "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
   );
@@ -51,8 +50,29 @@ export async function getStaticProps() {
         id: meetup._id.toString(),
       })),
     },
-    revalidate: 1,
   };
 }
+
+// export async function getStaticProps() {
+//   // const client = await MongoClient.connect(
+//   //   "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
+//   // );
+//   // const db = client.db();
+//   // const meetupsCollection = db.collection("meetups");
+//   // const meetups = await meetupsCollection.find().sort({_id:-1}).toArray();
+//   // client.close();
+
+//   // return {
+//   //   props: {
+//   //     meetups: meetups.map((meetup) => ({
+//   //       title: meetup.title,
+//   //       address: meetup.address,
+//   //       image: meetup.image,
+//   //       id: meetup._id.toString(),
+//   //     })),
+//   //   },
+//   //   revalidate: 1,
+//   // };
+// }
 
 export default HomePage;
