@@ -3,30 +3,30 @@ import { MongoClient, ObjectId } from "mongodb";
 
 async function handler(req, res) {
   if (req.method = "POST") {
-    const data = req.body;
-    const meetid = data.meetupid;
     // const client = await MongoClient.connect(
     //   "mongodb+srv://Niranjan:Niranjan@5121@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
     // );
-    // const client = await MongoClient.connect(
-    //    "mongodb+srv://niranjan101:Q3WO8k1zV5KGo4qM@cluster0.5i6tn.mongodb.net/meetups?retryWrites=true&w=majority"
-    // );
+    try{
+      const client = await MongoClient.connect(
+        "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
+      );
+      const db = client.db();
+      const meetupsCollection = db.collection("meetups");
+      const result = await meetupsCollection.find().sort({_id:-1}).toArray();
+      client.close();
 
-    const client = await MongoClient.connect(
-      "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
-    );
-    const db = client.db();
-    const meetupsCollection = db.collection("meetups");
-
-    const result = await meetupsCollection.deleteOne({
-        _id: ObjectId(meetid),
-      })
-
-    // console.log(result);
-
-    client.close();
-
-    res.status(201).json({ data: JSON.stringify(result) });
+      res.status(201).json({ 
+        status: "success",
+        data: JSON.stringify(result),
+        message: "Meetup fetch successfully."
+      });
+    }catch(error){
+      res.status(201).json({ 
+        status: "error",
+        data: [],
+        message: "Something went wrong."
+      });
+    }
   }
 }
 

@@ -8,52 +8,86 @@ function EditMeetupForm(props) {
   const imageInputRef = useRef();
   const addressInputRef = useRef();
   const descriptionInputRef = useRef();
+  const [titleError, setTitleError] = useState(null);
+  const [imageError, setImageError] = useState(null);
+  const [addressError, setAddressError] = useState(null);
+  const [descriptionError, setDescriptionError] = useState(null);
+  const [formValid, setFormValid] = useState(false);
 
   const [buttonText, setButtonText] = useState('Update');
 
   function submitHandler(event) {
     event.preventDefault();
-    setButtonText('Updating...');
+    setFormValid(true);
+    setTitleError(null);
+    setImageError(null);
+    setAddressError(null);
+    setDescriptionError(null);
+
     const enteredTitle = titleInputRef.current.value;
     const enteredImage = imageInputRef.current.value;
     const enteredAddress = addressInputRef.current.value;
     const enteredDescription = descriptionInputRef.current.value;
 
-    const meetupData = {
-        id: props.id,
-        title: enteredTitle,
-        image: enteredImage,
-        address: enteredAddress,
-        description: enteredDescription,
-    };
+    if(enteredTitle.trim() === ''){
+      setFormValid(false);
+      setTitleError('This field is required');
+    }
+    if(enteredImage.trim() === ''){
+      setFormValid(false);
+      setImageError('This field is required');
+    }
+    if(enteredAddress.trim() === ''){
+      setFormValid(false);
+      setAddressError('This field is required');
+    }
+    if(enteredDescription.trim() === ''){
+      setFormValid(false);
+      setDescriptionError('This field is required');
+    }
 
-    props.onUpdate(meetupData);
+    if(formValid){
+      setButtonText('Updating...');
+      const meetupData = {
+          id: props.id,
+          title: enteredTitle,
+          image: enteredImage,
+          address: enteredAddress,
+          description: enteredDescription,
+      };
+      props.onUpdate(meetupData);
+    }else{
+      return;
+    }
   }
 
   return (
     <Card>
       <form className={classes.form} onSubmit={submitHandler}>
         <div className={classes.control}>
-          <label htmlFor='title'>Meetup Title</label>
-          <input type='text' required id='title' ref={titleInputRef} defaultValue={props.title} />
+          <label htmlFor='title'>Title</label>
+          <input type='text' id='title' ref={titleInputRef} defaultValue={props.title} />
+          {titleError && <p style={{color: 'red', marginTop: '0%', marginBottom: '0%' }}>{titleError}</p>}
         </div>
         <div className={classes.control}>
-          <label htmlFor='image'>Meetup Image</label>
-          <input type='url' required id='image' ref={imageInputRef} defaultValue={props.image} />
+          <label htmlFor='image'>Image</label>
+          <input type='url' id='image' ref={imageInputRef} defaultValue={props.image} />
+          {imageError && <p style={{color: 'red', marginTop: '0%', marginBottom: '0%' }}>{imageError}</p>}
         </div>
         <div className={classes.control}>
           <label htmlFor='address'>Address</label>
-          <input type='text' required id='address' ref={addressInputRef} defaultValue={props.address} />
+          <input type='text' id='address' ref={addressInputRef} defaultValue={props.address} />
+          {addressError && <p style={{color: 'red', marginTop: '0%', marginBottom: '0%' }}>{addressError}</p>}
         </div>
         <div className={classes.control}>
           <label htmlFor='description'>Description</label>
           <textarea
             id='description'
-            required
-            rows='5'
+            rows='3'
             ref={descriptionInputRef}
             defaultValue={props.description}
           ></textarea>
+          {descriptionError && <p style={{color: 'red', marginTop: '0%', marginBottom: '0%' }}>{descriptionError}</p>}
         </div>
         <div className={classes.actions}>
           <button>{buttonText}</button>
