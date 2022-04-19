@@ -3,11 +3,15 @@ import Head from "next/head";
 import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 function HomePage(props) {
   const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteMeetupHandler = async (meetid) => {
+    setIsDeleting(true);
     const response = await fetch("/api/meetup/delete", {
       method: "POST",
       body: JSON.stringify({meetupid: meetid}),
@@ -17,6 +21,23 @@ function HomePage(props) {
     });
     const data = await response.json();
     router.push("/");
+    setIsDeleting(false);
+  }
+
+  let pageContent = '';
+
+  if(props.meetups.length === 0){
+    // pageContent = <LoadingSpinner />;
+    pageContent = <p style={{fontSize: '30px', textAlign: 'center'}} >No meetup found.</p>;
+  }
+
+  if(props.meetups.length > 0){
+    if(isDeleting){
+      // pageContent = <p style={{fontSize: '30px', textAlign: 'center'}} >Deleting...</p>;
+      pageContent = <LoadingSpinner />;
+    }else{
+      pageContent = <MeetupList meetups={props.meetups} onDelete={deleteMeetupHandler} />;
+    }
   }
 
   return (
@@ -28,10 +49,11 @@ function HomePage(props) {
           content="Browse a huge page of highly active React meetups!"
         />
       </Head>
-      <MeetupList meetups={props.meetups} onDelete={deleteMeetupHandler} />
+      {pageContent}
     </Fragment>
   );
 }
+
 export async function getServerSideProps(){
   const client = await MongoClient.connect(
     "mongodb+srv://prakash:Prakash777@cluster0.onlm4.mongodb.net/Meetup?retryWrites=true&w=majority"
